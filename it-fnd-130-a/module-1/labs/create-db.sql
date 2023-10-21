@@ -11,41 +11,36 @@
 // Select the Category ID and Category Name from the Categoryies table.
 */
 
-IF NOT EXISTS (
-  SELECT * FROM sys.databases WHERE name = 'Mod01LabsMaldonadoE'
-) CREATE DATABASE Mod01LabsMaldonadoE
-GO
+if not exists (
+  select * from sys.databases where name = 'Mod01LabsMaldonadoE'
+) create database Mod01LabsMaldonadoE
+go
 
-USE Mod01LabsMaldonadoE
-GO
+use Mod01LabsMaldonadoE
+go
 
-IF NOT EXISTS (
-  SELECT * FROM information_schema.tables WHERE table_name = 'Categories'
-) CREATE TABLE Categories
+if not exists (
+  select * from information_schema.tables where table_name = 'Categories'
+) create table Categories
 (
   CategoryID   int,
   CategoryName varchar(100)
 )
-GO
+go
 
-MERGE Categories as dst
-USING (
-  VALUES (
-    1, 'CatA'
-  )
+merge Categories as dst
+using (
+  values (1, 'CatA')
 ) as src (
   CategoryID,
   CategoryName
 )
-ON (dst.CategoryID = src.CategoryID AND dst.CategoryName = src.CategoryName)
-WHEN NOT MATCHED THEN
-  INSERT (
+on (dst.CategoryID = src.CategoryID AND dst.CategoryName = src.CategoryName)
+when not matched then
+  insert (
     CategoryID,
     CategoryName
-  ) 
-  VALUES (
-    1, 'CatA'
-  );
+  ) values (1, 'CatA');
 GO
 
 SELECT CategoryID, CategoryName FROM Categories;
