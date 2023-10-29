@@ -1,0 +1,31 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  CategoryID   Int       @id @default(autoincrement())
+  CategoryName String    @unique @db.NVarChar(100)
+  Products     Product[]
+}
+
+model Product {
+  ProductID           Int         @id @default(autoincrement())
+  ProductName         String      @unique @db.NVarChar(100)
+  ProductCurrentPrice Decimal?
+  Category            Category    @relation(fields: [CategoryID], references: [CategoryID])
+  CategoryID          Int
+  Inventories         Inventory[]
+}
+
+model Inventory {
+  InventoryID    Int      @id @default(autoincrement())
+  InventoryDate  DateTime
+  InventoryCount Int?     @default(0)
+  Product        Product  @relation(fields: [ProductID], references: [ProductID])
+  ProductID      Int
+}
