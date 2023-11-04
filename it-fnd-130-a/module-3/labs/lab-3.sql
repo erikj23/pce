@@ -1,0 +1,3 @@
+-- Select the category name, product name, and product price from both categories and products.
+-- Order the results by category name and then product name, in alphabetical order.
+-- (Hint: Join Products to Category)

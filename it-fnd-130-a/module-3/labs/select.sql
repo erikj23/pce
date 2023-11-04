@@ -1,1 +1,0 @@
-select CategoryID, CategoryName from Northwind.dbo.Categories where CategoryName = 'Seafood' 
