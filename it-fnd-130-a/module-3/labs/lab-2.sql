@@ -1,6 +1,8 @@
+-- View the structure of the database
+select top 3 * from Northwind.dbo.Products 
+
 -- Select the Product Id, Product Name, and Product Price of all Products with the Seafood's Category Id.
 -- Ordered by the highest to the lowest products price. 
--- select top 3 * from Northwind.dbo.Products -- view the structure of the database
 select ProductID, ProductName, UnitPrice * UnitsInStock [ProductPrice]
   from Northwind.dbo.Products
   where CategoryID = (

@@ -1,8 +1,10 @@
+-- View the structure of the database
+select top 3 * from Northwind..Categories
+select top 3 * from Northwind..Products
+
 -- Select the category name, product name, and product price from both categories and products.
 -- Order the results by category name and then product name, in alphabetical order.
 -- (Hint: Join Products to Category)
---select top 3 * from Northwind..Categories
---select top 3 * from Northwind..Products
 select cat.CategoryName, pro.ProductName, pro.UnitPrice
   from Northwind..Categories [cat]
   join Northwind..Products   [pro]
