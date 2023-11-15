@@ -3,22 +3,22 @@
 -- Desc: This file demonstrates how to process data in a database
 -- Change Log: When,Who,What
 -- 2023-01-01,RRoot,Created File
--- <Date>,<YourNameHere>,Added transaction code
+-- <Date>,Erik Maldonado,Added transaction code
 --**************************************************************************--
 Use Master;
 go
 
-If Exists(Select Name from SysDatabases Where Name = 'Assignment04DB_YourNameHere')
+If Exists(Select Name from SysDatabases Where Name = 'Assignment04DB_ErikMaldonado')
  Begin 
-  Alter Database [Assignment04DB_YourNameHere] set Single_user With Rollback Immediate;
-  Drop Database Assignment04DB_YourNameHere;
+  Alter Database [Assignment04DB_ErikMaldonado] set Single_user With Rollback Immediate;
+  Drop Database Assignment04DB_ErikMaldonado;
  End
 go
 
-Create Database Assignment04DB_YourNameHere;
+Create Database Assignment04DB_ErikMaldonado;
 go
 
-Use Assignment04DB_YourNameHere;
+Use Assignment04DB_ErikMaldonado;
 go
 
 -- Create Tables (Module 01)-- 

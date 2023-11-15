@@ -1,0 +1,4 @@
+-- Question 1: How would you add the data 'CatA' to the Categories table?
+-- Question 2: How would you add the data' ProdA', for CatA, with a price of $1.99 to the Products table?
+-- Question 3: How would you update the price of ProdA to $10.00 in the Products table?
+-- Question 4: How would you delete the CatA data from the Categories table?
