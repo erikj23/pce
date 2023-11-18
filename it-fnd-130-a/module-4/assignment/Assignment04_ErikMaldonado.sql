@@ -2,8 +2,8 @@
 -- Title: Assignment04
 -- Desc: This file demonstrates how to process data in a database
 -- Change Log: When,Who,What
--- 2023-01-01,RRoot,Created File
--- <Date>,Erik Maldonado,Added transaction code
+-- 2023-01-01, RRoot, Created File
+-- 2023-11-18, Erik Maldonado, Added Transaction Code
 --**************************************************************************--
 Use Master;
 go
@@ -22,12 +22,14 @@ Use Assignment04DB_ErikMaldonado;
 go
 
 -- Create Tables (Module 01)-- 
+drop table if exists Categories;
 Create Table Categories
 ([CategoryID] [int] IDENTITY(1,1) NOT NULL 
 ,[CategoryName] [nvarchar](100) NOT NULL
 );
 go
 
+drop table if exists Products;
 Create Table Products
 ([ProductID] [int] IDENTITY(1,1) NOT NULL 
 ,[ProductName] [nvarchar](100) NOT NULL 
@@ -36,6 +38,7 @@ Create Table Products
 );
 go
 
+drop table if exists Inventories;
 Create Table Inventories
 ([InventoryID] [int] IDENTITY(1,1) NOT NULL
 ,[InventoryDate] [Date] NOT NULL
@@ -104,6 +107,78 @@ go
 Select * from Inventories;
 go
 
+/************* FUNCTIONS *************/
+create or alter function SelectCategoryID (
+  @CategoryName [nvarchar](100)
+) returns int as begin
+  return (
+    select CategoryID from Categories where CategoryName = @CategoryName
+  )
+end;
+go
+
+/************* PROCEDURES *************/
+create proc ProcedureInsertCategories (
+  @CategoryName [nvarchar](100)
+) as begin
+  begin try
+    begin transaction
+      insert into Categories (
+        CategoryName
+      ) values (
+        @CategoryName
+      );
+    commit transaction
+  end try
+  begin catch
+    print Error_Message()
+    if @@trancount > 0 rollback transaction
+  end catch
+end
+go
+
+create proc ProcedureInsertProducts (
+  @ProductName [nvarchar](100),
+  @CategoryID  [int],
+  @UnitPrice   [money]
+) as begin
+  begin try
+    begin transaction
+      insert into Products (
+        ProductName, CategoryID, UnitPrice
+      ) values (
+        @ProductName, @CategoryID, @UnitPrice
+      );
+    commit transaction
+  end try
+  begin catch
+    print Error_Message()
+    if @@trancount > 0 rollback transaction
+  end catch
+end
+go
+
+create proc ProcedureInsertInventory (
+  @InventoryDate [nvarchar](100),
+  @ProductID     [int],
+  @Count         [int]
+) as begin
+  begin try
+    begin transaction
+      insert into Inventories (
+        InventoryDate, ProductID, Count
+      ) values (
+        @InventoryDate, @ProductID, @Count
+      );
+    commit transaction
+  end try
+  begin catch
+    print Error_Message()
+    if @@trancount > 0 rollback transaction
+  end catch
+end
+go
+
 /********************************* TASKS *********************************/
 
 -- Add the following data to this database.
@@ -128,35 +203,47 @@ Condiments	Chef Anton's Cajun Seasoning	22.00	2017-03-02	72
 
 -- Task 1 (20 pts): Add data to the Categories table
 -- TODO: Add Insert Code
+exec ProcedureInsertCategories
+  @CategoryName = 'Beverages';
+
+exec ProcedureInsertCategories
+  @CategoryName = 'Condiments';  
 go
-Select * from Categories;
+
+select * from Categories;
 go
 
 -- Task 2 (20 pts): Add data to the Products table
 -- TODO: Add Insert Code
+-- exec ProcedureInsertProducts
+--   @ProductName = 'Chai',
+--   @CategoryID  = GetCategoryID('Beverages'),
+--   @UnitPrice   = 18.00,
+
+
 go
-Select * from Products;
+--Select * from Products;
 go
 
 -- Task 3 (20 pts): Add data to the Inventories table
 -- TODO: Add Insert Code
 go
-Select * from Products;
+--Select * from Products;
 go
 
 -- Task 4 (10 pts): Write code to update the Category "Beverages" to "Drinks"
 -- TODO: Add Update Code
 go
-Select * from Categories;
+--Select * from Categories;
 go
 
 
 -- Task 5 (30 pts): Write code to delete all Condiments data from the database (in all three tables!)  
 -- TODO: Add Delete Code
 go
-Select * From Inventories;
-Select * From Products;
-Select * From Categories;
+--Select * From Inventories;
+--Select * From Products;
+--Select * From Categories;
 go
 
 /***************************************************************************************/
