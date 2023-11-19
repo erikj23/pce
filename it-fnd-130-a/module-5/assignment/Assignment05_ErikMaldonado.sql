@@ -1,24 +1,24 @@
 --*************************************************************************--
 -- Title: Assignment05
--- Author: YourNameHere
+-- Author: Erik Maldonado
 -- Desc: This file demonstrates how to use Joins and Subqueiers
 -- Change Log: When,Who,What
--- 2017-01-01,YourNameHere,Created File
+-- 2017-01-01, Erik Maldonado, Created File
 --**************************************************************************--
 Use Master;
 go
 
-If Exists(Select Name From SysDatabases Where Name = 'Assignment05DB_YourNameHere')
+If Exists(Select Name From SysDatabases Where Name = 'Assignment05DB_ErikMaldonado')
  Begin 
-  Alter Database [Assignment05DB_YourNameHere] set Single_user With Rollback Immediate;
-  Drop Database Assignment05DB_YourNameHere;
+  Alter Database [Assignment05DB_ErikMaldonado] set Single_user With Rollback Immediate;
+  Drop Database Assignment05DB_ErikMaldonado;
  End
 go
 
-Create Database Assignment05DB_YourNameHere;
+Create Database Assignment05DB_ErikMaldonado;
 go
 
-Use Assignment05DB_YourNameHere;
+Use Assignment05DB_ErikMaldonado;
 go
 
 -- Create Tables (Module 01)-- 
