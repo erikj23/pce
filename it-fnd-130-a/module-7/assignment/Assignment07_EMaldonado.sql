@@ -1,32 +1,36 @@
 --*************************************************************************--
 -- Title: Assignment07
--- Author: YourNameHere
+-- Author: Erik Maldonado
 -- Desc: This file demonstrates how to use Functions
 -- Change Log: When,Who,What
--- 2017-01-01,YourNameHere,Created File
+-- 2017-01-01,Erik Maldonado,Created File
 --**************************************************************************--
 Begin Try
 	Use Master;
-	If Exists(Select Name From SysDatabases Where Name = 'Assignment07DB_YourNameHere')
+	If Exists(Select Name From SysDatabases Where Name = 'Assignment07DB_EMaldonado')
 	 Begin 
-	  Alter Database [Assignment07DB_YourNameHere] set Single_user With Rollback Immediate;
-	  Drop Database Assignment07DB_YourNameHere;
+	  Alter Database [Assignment07DB_EMaldonado] set Single_user With Rollback Immediate;
+	  Drop Database Assignment07DB_EMaldonado;
 	 End
-	Create Database Assignment07DB_YourNameHere;
+	Create Database Assignment07DB_EMaldonado;
 End Try
 Begin Catch
 	Print Error_Number();
 End Catch
 go
-Use Assignment07DB_YourNameHere;
+
+Use Assignment07DB_EMaldonado
+go
 
 -- Create Tables (Module 01)-- 
+drop table if exists Categories
 Create Table Categories
 ([CategoryID] [int] IDENTITY(1,1) NOT NULL 
 ,[CategoryName] [nvarchar](100) NOT NULL
 );
 go
 
+drop table if exists Products
 Create Table Products
 ([ProductID] [int] IDENTITY(1,1) NOT NULL 
 ,[ProductName] [nvarchar](100) NOT NULL 
@@ -35,6 +39,7 @@ Create Table Products
 );
 go
 
+drop table if exists Employees
 Create Table Employees -- New Table
 ([EmployeeID] [int] IDENTITY(1,1) NOT NULL 
 ,[EmployeeFirstName] [nvarchar](100) NOT NULL
@@ -43,6 +48,7 @@ Create Table Employees -- New Table
 );
 go
 
+drop table if exists Inventories
 Create Table Inventories
 ([InventoryID] [int] IDENTITY(1,1) NOT NULL
 ,[InventoryDate] [Date] NOT NULL
@@ -155,31 +161,31 @@ go
 
 
 -- Adding Views (Module 06) -- 
-Create View vCategories With SchemaBinding
+Create or alter View vCategories With SchemaBinding
  AS
   Select CategoryID, CategoryName From dbo.Categories;
 go
-Create View vProducts With SchemaBinding
+Create or alter View vProducts With SchemaBinding
  AS
   Select ProductID, ProductName, CategoryID, UnitPrice From dbo.Products;
 go
-Create View vEmployees With SchemaBinding
+Create or alter View vEmployees With SchemaBinding
  AS
   Select EmployeeID, EmployeeFirstName, EmployeeLastName, ManagerID From dbo.Employees;
 go
-Create View vInventories With SchemaBinding 
+Create or alter View vInventories With SchemaBinding 
  AS
   Select InventoryID, InventoryDate, EmployeeID, ProductID, ReorderLevel, [Count] From dbo.Inventories;
 go
 
 -- Show the Current data in the Categories, Products, and Inventories Tables
-Select * From vCategories;
+--Select * From vCategories;
 go
-Select * From vProducts;
+--Select * From vProducts;
 go
-Select * From vEmployees;
+--Select * From vEmployees;
 go
-Select * From vInventories;
+--Select * From vInventories;
 go
 
 /********************************* Questions and Answers *********************************/
@@ -193,26 +199,30 @@ Print
 -- Show a list of Product names and the price of each product.
 -- Use a function to format the price as US dollars.
 -- Order the result by the product name.
-
--- <Put Your Code Here> --
-
+select ProductName, UnitPrice = format(UnitPrice, 'c', 'en-US') from vProducts
+	order by ProductName;
 go
 
 -- Question 2 (10% of pts): 
 -- Show a list of Category and Product names, and the price of each product.
 -- Use a function to format the price as US dollars.
 -- Order the result by the Category and Product.
--- <Put Your Code Here> --
-
+select CategoryName, ProductName, UnitPrice = format(UnitPrice, 'c', 'en-US') 
+	from vCategories [Category]
+	join vProducts	 [Product]
+		on Category.CategoryID = Product.CategoryID
+	order by CategoryName, ProductName;
 go
 
 -- Question 3 (10% of pts): 
 -- Use functions to show a list of Product names, each Inventory Date, and the Inventory Count.
 -- Format the date like 'January, 2017'.
 -- Order the results by the Product and Date.
-
--- <Put Your Code Here> --
-
+select Product.ProductName, InventoryDate = format(InventoryDate, 'MMMM, yyyy'), InventoryCount = Count
+	from vProducts		[Product]
+	join vInventories [Inventory]
+		on Product.ProductID = Inventory.ProductID
+	order by ProductName, InventoryDate;
 go
 
 -- Question 4 (10% of pts): 
@@ -220,11 +230,18 @@ go
 -- Shows a list of Product names, each Inventory Date, and the Inventory Count. 
 -- Format the date like 'January, 2017'.
 -- Order the results by the Product and Date.
-
--- <Put Your Code Here> --
+create or alter view vProductInventories with schemabinding as
+  select top 10000
+			ProductName    = Product.ProductName,
+			InventoryDate  = format(InventoryDate, 'MMMM, yyyy'),
+			InventoryCount = Count
+		from dbo.vProducts		[Product]
+		join dbo.vInventories [Inventory]
+			on Product.ProductID = Inventory.ProductID
+		order by ProductName, convert(date, InventoryDate);
 go
 
--- Check that it works: Select * From vProductInventories;
+select * from vProductInventories
 go
 
 -- Question 5 (10% of pts): 
@@ -232,23 +249,41 @@ go
 -- Shows a list of Category names, Inventory Dates, and a TOTAL Inventory Count BY CATEGORY
 -- Format the date like 'January, 2017'.
 -- Order the results by the Product and Date.
-
--- <Put Your Code Here> --
+create or alter view vCategoryInventories with schemabinding as
+  select top 10000
+			CategoryName 						 = Category.CategoryName,
+			InventoryDate            = format(InventoryDate, 'MMMM, yyyy'),
+			InventoryCountByCategory = sum(Count)
+		from dbo.vCategories 	[Category]
+		join dbo.vProducts    [Product]
+			on Category.CategoryID = Product.CategoryID
+		join dbo.vInventories [Inventory]
+			on Product.ProductID = Inventory.ProductID
+		group by CategoryName, InventoryDate
+		order by CategoryName, convert(date, InventoryDate);
 go
--- Check that it works: Select * From vCategoryInventories;
+
+select * from vCategoryInventories
 go
 
 -- Question 6 (10% of pts): 
--- CREATE ANOTHER VIEW called vProductInventoriesWithPreviouMonthCounts. 
+-- CREATE ANOTHER VIEW called vProductInventoriesWithPreviousMonthCounts. 
 -- Show a list of Product names, Inventory Dates, Inventory Count, AND the Previous Month Count.
 -- Use functions to set any January NULL counts to zero. 
 -- Order the results by the Product and Date. 
 -- This new view must use your vProductInventories view.
-
--- <Put Your Code Here> --
+create or alter view vProductInventoriesWithPreviousMonthCounts with schemabinding as
+  select top 10000
+			ProductName, 
+			InventoryDate, 
+			InventoryCount     = isnull(InventoryCount, 0), 
+			PreviousMonthCount = isnull(lag(InventoryCount)
+				over (partition by ProductName order by convert(date, InventoryDate)), 0)
+		from dbo.vProductInventories
+		order by ProductName, convert(date, InventoryDate)
 go
 
--- Check that it works: Select * From vProductInventoriesWithPreviousMonthCounts;
+select * from vProductInventoriesWithPreviousMonthCounts
 go
 
 -- Question 7 (15% of pts): 
@@ -257,11 +292,22 @@ go
 -- The Previous Month Count is a KPI. The result can show only KPIs with a value of either 1, 0, or -1. 
 -- Display months with increased counts as 1, same counts as 0, and decreased counts as -1. 
 -- Varify that the results are ordered by the Product and Date.
+create or alter view vProductInventoriesWithPreviousMonthCountsWithKPIs with schemabinding as
+  select top 10000
+			ProductName, 
+			InventoryDate, 
+			InventoryCount,
+			PreviousMonthCount,
+			PreviousMonthCountKPIs = case
+				when InventoryCount > PreviousMonthCount then 1
+				when InventoryCount = PreviousMonthCount then 0
+				when InventoryCount < PreviousMonthCount then -1
+				else null end
+		from dbo.vProductInventoriesWithPreviousMonthCounts
+		order by ProductName, convert(date, InventoryDate)
+go
 
--- <Put Your Code Here> --
-
--- Important: This new view must use your vProductInventoriesWithPreviousMonthCounts view!
--- Check that it works: Select * From vProductInventoriesWithPreviousMonthCountsWithKPIs;
+select * from vProductInventoriesWithPreviousMonthCountsWithKPIs
 go
 
 -- Question 8 (25% of pts): 
@@ -271,15 +317,18 @@ go
 -- Display months with increased counts as 1, same counts as 0, and decreased counts as -1. 
 -- The function must use the ProductInventoriesWithPreviousMonthCountsWithKPIs view.
 -- Varify that the results are ordered by the Product and Date.
-
--- <Put Your Code Here> --
+create or alter function fProductInventoriesWithPreviousMonthCountsWithKPIs(
+	@KPI int
+) returns table as return (
+	select top 10000 *
+		from vProductInventoriesWithPreviousMonthCountsWithKPIs
+		where PreviousMonthCountKPIs = @KPI
+)	
 go
 
-/* Check that it works:
-Select * From fProductInventoriesWithPreviousMonthCountsWithKPIs(1);
-Select * From fProductInventoriesWithPreviousMonthCountsWithKPIs(0);
-Select * From fProductInventoriesWithPreviousMonthCountsWithKPIs(-1);
-*/
+select * from fProductInventoriesWithPreviousMonthCountsWithKPIs(1);
+select * from fProductInventoriesWithPreviousMonthCountsWithKPIs(0);
+select * from fProductInventoriesWithPreviousMonthCountsWithKPIs(-1);
 go
 
 /***************************************************************************************/
