@@ -24,7 +24,7 @@ Use ITFnd130FinalDB_EMaldonado;
 -- Create Tables (Review Module 01)-- 
 
 
--- Add Constraints (Review Module 02) -- 
+-- Add Constraints (Review Module 02) -- 	
 
 
 -- Add Views (Review Module 03 and 06) -- 
