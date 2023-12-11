@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "prisma": "^5.7.0",
+    "prisma-dbml-generator": "^0.9.1",
+    "prisma-erd-generator": "^1.11.2"
+  }
+}

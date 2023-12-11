@@ -1,0 +1,45 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+model Courses {
+  ID            Int             @id @default(autoincrement())
+  Name          String
+  StartDate     DateTime?
+  EndDate       DateTime?
+  StartTime     DateTime?
+  EndTime       DateTime?
+  DaysOfWeek    String?
+  CurrentPrice  Decimal?
+  Registrations Registrations[]
+}
+
+model Students {
+  ID            Int             @id @default(autoincrement())
+  FirstName     String
+  LastName      String
+  UserName      String
+  EmailAddress  String
+  MailAddress   String
+  ContactNumber String
+  Registrations Registrations[]
+}
+
+model Registrations {
+  ID        Int      @id @default(autoincrement())
+  Date      DateTime
+  Payment   Decimal
+  Course    Courses  @relation(fields: [CourseID], references: [ID], onDelete: Cascade)
+  CourseID  Int
+  Student   Students @relation(fields: [StudentID], references: [ID], onDelete: Cascade)
+  StudentID Int
+}

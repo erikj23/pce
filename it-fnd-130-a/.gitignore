@@ -1,1 +1,10 @@
+
+# ? idk
 .DS_Store
+
+# prisma artifacts
+*/dbml/
+
+# node stuffs
+node_modules/
+package-lock.json
